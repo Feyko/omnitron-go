@@ -38,5 +38,5 @@ func TestInitEnvironmentReturnsBotStruct(t *testing.T) {
 
 	testResponse, _ := InitEnvironment()
 
-	assert.Equal("Omnitron-Go", testResponse.username)
+	assert.Equal("Omnitron-Go", testResponse.Username)
 }

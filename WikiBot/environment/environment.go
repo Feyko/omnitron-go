@@ -55,7 +55,7 @@ them as a BotOperatingValues object
 
 func InitEnvironment() (WikiBot.Core, error) {
 
-	var bot WikiBot.Core.
+	var bot WikiBot.Core
 
 	err := loadEnv()
 	if err != nil {
@@ -63,9 +63,9 @@ func InitEnvironment() (WikiBot.Core, error) {
 	}
 
 	envValues := map[string]*string{
-		"WIKI_URL":      &bot.wikiUrl,
-		"WIKI_USERNAME": &bot.username,
-		"WIKI_PASSWORD": &bot.password,
+		"WIKI_URL":      &bot.WikiUrl,
+		"WIKI_USERNAME": &bot.Username,
+		"WIKI_PASSWORD": &bot.Password,
 	}
 	for k, v := range envValues {
 		envValue, err := getEnvValue(k)
