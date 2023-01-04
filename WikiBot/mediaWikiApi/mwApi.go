@@ -82,17 +82,7 @@ func (rc RecentChanges) Map() map[string]string {
 			value = "recentchanges"
 			name = field.Name
 		default:
-			fieldValue := reflect.ValueOf(rc).FieldByName(field.Name)
-			if fieldValue.Kind() == reflect.Int {
-				value = strconv.FormatInt(fieldValue.Int(), 10)
-			}
-			if fieldValue.Kind() == reflect.String {
-				value = fieldValue.String()
-			}
-
-			if value == "0" || value == "" {
-				value, _ = field.Tag.Lookup("default")
-			}
+			value = getValueOrDefault(rc, field)
 
 			name = "rc" + strings.ToLower(field.Name)
 		}
@@ -102,4 +92,19 @@ func (rc RecentChanges) Map() map[string]string {
 	}
 
 	return output
+}
+
+func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string) {
+	fieldValue := reflect.ValueOf(q).FieldByName(field.Name)
+	if fieldValue.Kind() == reflect.Int {
+		value = strconv.FormatInt(fieldValue.Int(), 10)
+	}
+	if fieldValue.Kind() == reflect.String {
+		value = fieldValue.String()
+	}
+
+	if value == "0" || value == "" {
+		value, _ = field.Tag.Lookup("default")
+	}
+	return value
 }
