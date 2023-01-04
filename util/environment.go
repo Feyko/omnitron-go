@@ -55,7 +55,7 @@ them as a BotOperatingValues object
 
 func InitEnvironment() (WikiBot.Core, error) {
 
-	var bot WikiBot.Core
+	var bot WikiBot.Core.
 
 	err := loadEnv()
 	if err != nil {
