@@ -1,7 +1,10 @@
 package WikiBot
 
 import (
+	"fmt"
+
 	"cgt.name/pkg/go-mwclient"
+	"github.com/lynkfox/omnitron-go/WikiBot/wikiApi"
 )
 
 type Core struct {
@@ -12,8 +15,6 @@ type Core struct {
 }
 
 func (bot *Core) Connect() {
-	// Initialize a *Client with New(), specifying the wiki's API URL
-	// and your HTTP User-Agent. Try to use a meaningful User-Agent.
 	client, err := mwclient.New(bot.WikiUrl, bot.Username)
 	if err != nil {
 		panic(err)
@@ -21,7 +22,6 @@ func (bot *Core) Connect() {
 
 	bot.client = *client
 
-	// Log in.
 	err = bot.client.Login(bot.Username, bot.Password)
 	if err != nil {
 		panic(err)
@@ -29,16 +29,15 @@ func (bot *Core) Connect() {
 
 }
 
-/*	// Specify parameters to send.
+func (bot *Core) GetRecentChanges() {
 	parameters := map[string]string{
-		"action":   "query",
-		"list":     "recentchanges",
+		"action":   wikiApi.Query,
+		"list":     wikiApi.RecentChanges,
 		"rclimit":  "2",
 		"rctype":   "edit",
 		"continue": "",
 	}
 
-	// Make the request.
 	resp, err := w.Get(parameters)
 	if err != nil {
 		panic(err)
@@ -46,4 +45,4 @@ func (bot *Core) Connect() {
 
 	// Print the *jason.Object
 	fmt.Println(resp)
-*/
+}
