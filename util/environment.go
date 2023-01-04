@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/lynkfox/omnitron-go/bot"
+	"github.com/lynkfox/omnitron-go/WikiBot"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -53,9 +53,9 @@ func loadEnv() error {
 them as a BotOperatingValues object
 */
 
-func InitEnvironment() (bot.WikiBot, error) {
+func InitEnvironment() (WikiBot.Core, error) {
 
-	var bot bot.WikiBot
+	var bot WikiBot.Core
 
 	err := loadEnv()
 	if err != nil {

@@ -1,6 +1,6 @@
-package bot
+package WikiBot
 
-type WikiBot struct {
+type Core struct {
 	username string
 	password string
 	wikiUrl  string
