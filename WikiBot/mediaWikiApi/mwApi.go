@@ -2,6 +2,7 @@ package mwApi
 
 import (
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -55,13 +56,13 @@ type QueryMapper interface {
 type RecentChanges struct {
 	action   Property
 	list     Property
-	Limit    int
-	TopOnly  bool
-	Continue string
+	Limit    int    `default:"max"`
+	TopOnly  bool   `default:"false"`
+	Continue bool   `default:"false"`
 	Start    string // Timestamp in ISO8601 format YYYY-MM-DDThh:mm:ssZ
 }
 
-func (rc *RecentChanges) Map() map[string]string {
+func (rc RecentChanges) Map() map[string]string {
 	fields := reflect.VisibleFields(reflect.TypeOf((struct{ RecentChanges }{})))
 
 	output := make(map[string]string, len(fields))
@@ -81,7 +82,18 @@ func (rc *RecentChanges) Map() map[string]string {
 			value = "recentchanges"
 			name = field.Name
 		default:
-			value = ""
+			fieldValue := reflect.ValueOf(rc).FieldByName(field.Name)
+			if fieldValue.Kind() == reflect.Int {
+				value = strconv.FormatInt(fieldValue.Int(), 10)
+			}
+			if fieldValue.Kind() == reflect.String {
+				value = fieldValue.String()
+			}
+
+			if value == "0" || value == "" {
+				value, _ = field.Tag.Lookup("default")
+			}
+
 			name = "rc" + strings.ToLower(field.Name)
 		}
 
