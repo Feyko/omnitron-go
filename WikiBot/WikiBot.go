@@ -1,10 +1,10 @@
 package WikiBot
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"cgt.name/pkg/go-mwclient"
-	"github.com/lynkfox/omnitron-go/WikiBot/wikiApi"
+	"github.com/antonholmquist/jason"
 )
 
 type Core struct {
@@ -14,35 +14,42 @@ type Core struct {
 	client   mwclient.Client
 }
 
-func (bot *Core) Connect() {
+/* Connect generates a client and logs in, storing the client on the Core struct
+ */
+func (bot *Core) Connect() error {
 	client, err := mwclient.New(bot.WikiUrl, bot.Username)
 	if err != nil {
-		panic(err)
+		return errors.Wrap(err, "Could not generate Client")
 	}
 
 	bot.client = *client
 
 	err = bot.client.Login(bot.Username, bot.Password)
 	if err != nil {
-		panic(err)
+		return errors.Wrap(err, "Failed Login")
 	}
+
+	return nil
 
 }
 
-func (bot *Core) GetRecentChanges() {
+/*
+GetRecentChanges queries the Recent Changes List from the api and returns a
+list of the changes, or nil and an error if it fails.
+*/
+func (bot *Core) GetRecentChanges() (*jason.Object, error) {
 	parameters := map[string]string{
-		"action":   wikiApi.Query,
-		"list":     wikiApi.RecentChanges,
+		"action":   "query",
+		"list":     "recentchanges",
 		"rclimit":  "2",
 		"rctype":   "edit",
 		"continue": "",
 	}
 
-	resp, err := w.Get(parameters)
+	resp, err := bot.client.Get(parameters)
 	if err != nil {
-		panic(err)
+		return nil, errors.Wrap(err, "Recent Changes failed to get")
 	}
 
-	// Print the *jason.Object
-	fmt.Println(resp)
+	return resp, nil
 }
