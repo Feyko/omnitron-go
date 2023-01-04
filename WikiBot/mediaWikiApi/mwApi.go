@@ -90,20 +90,36 @@ func (rc RecentChanges) Map() map[string]string {
 			continue
 		}
 
-		value, includeKey := getValueOrDefault(rc, field)
-		prefix, _ := field.Tag.Lookup("prefix")
 		// if can't find the prefix tag, its ok to be blank string
-		name := prefix + strings.ToLower(field.Name)
-
-		if includeKey {
-			output[name] = value
-		}
+		getKeyAndValue(rc, field, output)
 
 	}
 
 	return output
 }
 
+/*
+	getKeyAndValue checks for tags for default and special, and includes any fields
+
+with either a provided value, a default tag value, or a special tag value in the
+map for parameters
+*/
+func getKeyAndValue(rc RecentChanges, field reflect.StructField, output map[string]string) {
+	value, includeKey := getValueOrDefault(rc, field)
+	prefix, _ := field.Tag.Lookup("prefix")
+
+	name := prefix + strings.ToLower(field.Name)
+
+	if includeKey {
+		output[name] = value
+	}
+}
+
+/*
+	getValueOrDefault checks the field value and returns it or the default tag
+
+value. If no default tag is defined, it returns blank string and false for OK
+*/
 func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string, ok bool) {
 
 	fieldValue := reflect.ValueOf(q).FieldByName(field.Name)
