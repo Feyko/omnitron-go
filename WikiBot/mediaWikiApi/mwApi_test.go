@@ -58,3 +58,14 @@ func TestRecentChangesMapperSetsRcLimitToMaxIfLimitIsNeg1(t *testing.T) {
 
 	assert.Equal(testResult["rclimit"], "max", "Mapping Recent Changes param did not set [rclimit:-1] to [max]")
 }
+
+func TestRecentChangesMapperDoesNotOutputStartIfNotSet(t *testing.T) {
+	assert := assert.New(t)
+
+	var testValue RecentChanges
+	testValue.Limit = 2
+
+	testResult := testValue.Map()
+
+	assert.NotContains(testResult, "rcstart", "Mapping Recent Changes still included [rcstart] in output keys")
+}
