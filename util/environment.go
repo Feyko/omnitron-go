@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/lynkfox/bot"
+	"github.com/lynkfox/omnitron-go/bot"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
