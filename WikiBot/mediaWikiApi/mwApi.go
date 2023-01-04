@@ -6,22 +6,21 @@ import (
 	"strings"
 )
 
-/* QueryMapper interfaces output MediaWiki query parameters in a map format */
+// A QueryMapper can have its properties output as a map, with defaults and prefix for keys.
 type QueryMapper interface {
 	Map() map[string]string
 }
 
 /*
-	RecentChanges is the parameter set for querying for a list of the recent changes
+RecentChanges is the parameter set for querying for a list of the recent changes from the wiki.
 
-from the wiki.
+Defaults:
 
-Defaults to:
-Limit = "max" (can also set to -1 for "max")
-Type filter to "edit"
-TopOnly to false
-Continue to be included
-No start time
+	Type filter to "edit"
+	TopOnly to false
+	Continue to be included
+	Limit not set
+	No start time
 */
 type RecentChanges struct {
 	action   string `default:"query"`
@@ -33,9 +32,7 @@ type RecentChanges struct {
 }
 
 /*
-	Map creates a query action for getting list of the RecentChanges in a map
-
-format for use with mwclient.Get (or the WikiBot.Core.client)
+RecentChanges.Map outputs the parameters as a map for mwclient.Client.Get actions.
 */
 func (rc RecentChanges) Map() map[string]string {
 	fields := reflect.VisibleFields(reflect.TypeOf((struct{ RecentChanges }{})))
@@ -56,13 +53,10 @@ func (rc RecentChanges) Map() map[string]string {
 }
 
 /*
-	getKeyAndValue checks for tags for default and special, and includes any fields
-
-with either a provided value, a default tag value, or a special tag value in the
-map for parameters
+GetKeyAndValue is a helper for converting a QueryMapper type fields to a map.
 */
-func getKeyAndValue(rc RecentChanges, field reflect.StructField, output map[string]string) {
-	value, includeKey := getValueOrDefault(rc, field)
+func getKeyAndValue(q QueryMapper, field reflect.StructField, output map[string]string) {
+	value, includeKey := getValueOrDefault(q, field)
 	prefix, _ := field.Tag.Lookup("prefix")
 
 	name := prefix + strings.ToLower(field.Name)
@@ -73,9 +67,7 @@ func getKeyAndValue(rc RecentChanges, field reflect.StructField, output map[stri
 }
 
 /*
-	getValueOrDefault checks the field value and returns it or the default tag
-
-value. If no default tag is defined, it returns blank string and false for OK
+GetValueOrDefault is a helper for determining the value of a QueryMapper field or its default.
 */
 func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string, ok bool) {
 
