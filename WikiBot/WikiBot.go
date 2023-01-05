@@ -66,5 +66,10 @@ func (bot *Core) GetRecentChanges(parameters *mwApi.RecentChanges) (*jason.Objec
 		return nil, errors.Wrap(err, "RecentChanges: %v")
 	}
 
+	/* TODO: Handle nextToken loop
+
+	nextToken, err := resp.GetString("continue", "rcontinue")
+	*/
+
 	return resp, nil
 }

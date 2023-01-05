@@ -69,3 +69,25 @@ func TestRecentChangesMapperDoesNotOutputStartIfNotSet(t *testing.T) {
 
 	assert.NotContains(testResult, "rcstart", "Mapping Recent Changes still included [rcstart] in output keys")
 }
+
+func TestRecentChangesMapperChangesNextPageToContinue(t *testing.T) {
+	assert := assert.New(t)
+
+	var testValue RecentChanges
+	testValue.NextPage = "Test"
+
+	testResult := testValue.Map()
+
+	assert.Equal(testResult["continue"], "Test", "Mapping Recent Changes param did not set [continue] to [test]")
+}
+
+func TestRecentChangesMapperRemovesNextPageIfItWasNotBlank(t *testing.T) {
+	assert := assert.New(t)
+
+	var testValue RecentChanges
+	testValue.NextPage = "Test"
+
+	testResult := testValue.Map()
+
+	assert.NotContains(testResult, "nexttoken", "Mapping Recent Changes still contained [nexttoken] key")
+}
