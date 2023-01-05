@@ -36,6 +36,11 @@ func (bot *Core) Connect() error {
 
 }
 
+func (bot *Core) Close() error {
+	err := bot.client.Logout()
+	return err
+}
+
 /*
 WikiGet sends a GET request to the wiki client logged in.
 */

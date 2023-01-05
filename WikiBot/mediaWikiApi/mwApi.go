@@ -27,7 +27,7 @@ type RecentChanges struct {
 	list     string `default:"recentchanges"`
 	Limit    int    `prefix:"rc" special:"max"`
 	Type     string `default:"edit" prefix:"rc"`
-	Continue bool   `default:"" prefix:"rc"`
+	Continue string `prefix:"rc"`
 	Start    string `prefix:"rc"` // Timestamp in ISO8601 format YYYY-MM-DDThh:mm:ssZ
 }
 
@@ -35,9 +35,7 @@ type RecentChanges struct {
 RecentChanges.Map outputs the parameters as a map for mwclient.Client.Get actions.
 */
 func (rc RecentChanges) Map() map[string]string {
-	fields := reflect.VisibleFields(reflect.TypeOf((struct{ RecentChanges }{})))
-
-	output := make(map[string]string, len(fields))
+	fields, output := prepMap(struct{ RecentChanges }{})
 
 	for _, field := range fields {
 
@@ -50,6 +48,36 @@ func (rc RecentChanges) Map() map[string]string {
 	}
 
 	return output
+}
+
+type Parse struct {
+	action string `default:"parse"`
+	Page   string
+}
+
+func (pa Parse) Map() map[string]string {
+	fields, output := prepMap(struct{ Parse }{})
+
+	for _, field := range fields {
+
+		if field.Name == "Parse" {
+			continue
+		}
+		// if can't find the prefix tag, its ok to be blank string
+		getKeyAndValue(pa, field, output)
+
+	}
+
+	return output
+}
+
+/*PrepMap takes a Type and generates the fields and a preparatory map for them.
+ */
+func prepMap(structType any) ([]reflect.StructField, map[string]string) {
+	fields := reflect.VisibleFields(reflect.TypeOf(structType))
+
+	output := make(map[string]string, len(fields))
+	return fields, output
 }
 
 /*
