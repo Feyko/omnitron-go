@@ -16,6 +16,7 @@ func TestParseMapperPrioritizesPageIdOverOtherIdentifiers(t *testing.T) {
 
 	testResult := testValue.Map()
 
-	assert.NotContains(testResult, "page", "Parse Mapper was given [PageId] value and still contains mutually exclusive [page] key")
-	assert.NotContains(testResult, "title", "Parse Mapper was given [PageId] value and still contains mutually exclusive [title] key")
+	assert.Contains(testResult, "title", "Parse Mapper should have contained [title] key")
+	assert.NotContains(testResult, "page", "Parse Mapper was given [Title] value and still contains mutually exclusive [page] key")
+	assert.NotContains(testResult, "pageid", "Parse Mapper was given [Title] value and still contains mutually exclusive [pageid] key")
 }

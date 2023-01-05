@@ -6,15 +6,15 @@ import (
 
 type Parse struct {
 	action string `default:"parse"`
+	Title  string
 	PageId string
 	Page   string
-	Title  string
 }
 
 func (pa Parse) Map() map[string]string {
 	fields, output := prepMap(struct{ Parse }{})
 
-	// these values are mutually exclusive to one another. If more than one are set we dont want
+	// these values are mutually exclusive to one another. If more than one are set we don't want
 	// them all sent to the api parameters
 	contentIdentifiers := []string{"PageId", "Page", "Title"}
 
@@ -29,12 +29,14 @@ func (pa Parse) Map() map[string]string {
 		// since reflection returns the slice of fields in the order in which they are defined on the struct
 		// we can use that to define priority as well
 		if slices.Contains(contentIdentifiers, field.Name) {
+
+			if alreadyHaveContentIdentifier {
+				continue
+			}
+
 			alreadyHaveContentIdentifier = !isFieldBlank(pa, field)
 		}
 
-		if alreadyHaveContentIdentifier {
-			continue
-		}
 		getKeyAndValue(pa, field, output)
 
 	}
