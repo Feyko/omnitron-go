@@ -2,6 +2,7 @@ package mwApi
 
 /*
 RecentChanges is the parameter set for querying for a list of the recent changes from the wiki.
+It implements the QueryMapper interface.
 
 Defaults:
 

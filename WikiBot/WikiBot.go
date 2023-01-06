@@ -54,6 +54,14 @@ func (bot *Core) WikiGet(parameters mwApi.QueryMapper) (*jason.Object, error) {
 
 /*
 GetRecentChanges is a wrapper around WikiGet for a default or custom RecentChanges query.
+
+Pass nil to use default RecentChanges query of:
+
+	Type filter to "edit"
+	TopOnly to false
+	Continue to be included
+	Limit not set
+	No start time
 */
 func (bot *Core) GetRecentChanges(parameters *mwApi.RecentChanges) (*jason.Object, error) {
 	if parameters == nil {

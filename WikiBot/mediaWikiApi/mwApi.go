@@ -1,3 +1,8 @@
+/*
+	The mwApi Package contains the mediaWiki API connection information.
+
+In addition it contains the basic core functionality that either the Sentinels or SpiritIsland packages will implement
+*/
 package mwApi
 
 import (
