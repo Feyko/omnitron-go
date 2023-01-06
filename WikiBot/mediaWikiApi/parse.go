@@ -48,6 +48,3 @@ func (pa Parse) Map() map[string]string {
 	return output
 
 }
-
-type ParseProps struct {
-}
