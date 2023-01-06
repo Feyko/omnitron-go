@@ -11,14 +11,24 @@ import (
 	"strings"
 )
 
-// A QueryMapper can have its properties output as a map, with defaults and prefix for keys.
+/* A QueryMapper can have its properties output as a map, with defaults and prefix for keys.
+
+Use tags when implementing a QueryMapper:
+
+	default:"[default value]" - the default value to include if the property is "", 0, or nil.
+	special:"[special value]" - a specific value to use for the property if it is set to -1.
+		useful for integer properties that also can accept strings like "max"
+	prefix: "[prefix]" a prefix for the key, such as 'rc' on the Limit property, leading to 'rclimit' as the output key.
+	ignore:"any value" if the ignore tag is present, this property is ignored and not included in the Map output.
+*/
+
 type QueryMapper interface {
 	Map() map[string]string
 }
 
 /*PrepMap takes a Type and generates the fields and a preparatory map for them.
  */
-func prepMap(structType any) ([]reflect.StructField, map[string]string) {
+func PrepMap(structType any) ([]reflect.StructField, map[string]string) {
 	fields := reflect.VisibleFields(reflect.TypeOf(structType))
 
 	output := make(map[string]string, len(fields))
@@ -28,7 +38,7 @@ func prepMap(structType any) ([]reflect.StructField, map[string]string) {
 /*
 GetKeyAndValue is a helper for converting a QueryMapper type fields to a map.
 */
-func getKeyAndValue(q QueryMapper, field reflect.StructField, output map[string]string) {
+func GetKeyAndValue(q QueryMapper, field reflect.StructField, output map[string]string) {
 	value, includeKey := getValueOrDefault(q, field)
 	prefix, _ := field.Tag.Lookup("prefix")
 
@@ -46,6 +56,11 @@ func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string, 
 
 	value = extractString(q, field)
 
+	ignoreValue, ok := field.Tag.Lookup("ignore")
+	if ignoreValue != "" {
+		return "", false
+	}
+
 	// -1 is used for special situations where defaulting may not be the right call
 	// i.e.: max for rclimit
 	if value == "-1" {
@@ -53,8 +68,6 @@ func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string, 
 		return specialValue, ok
 	}
 
-	// 0 and "" indicate the field was never set or that the user wants to use
-	// the default.
 	if isFieldBlank(q, field) {
 		defaultValue, ok := field.Tag.Lookup("default")
 		return defaultValue, ok
@@ -62,6 +75,9 @@ func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string, 
 	return value, true
 }
 
+/*
+ExtractString gets the value of the field back as a string, for use in the QueryMapper.Map() functions
+*/
 func extractString(q QueryMapper, field reflect.StructField) (value string) {
 	fieldValue := reflect.ValueOf(q).FieldByName(field.Name)
 
@@ -78,5 +94,7 @@ func extractString(q QueryMapper, field reflect.StructField) (value string) {
  */
 func isFieldBlank(q QueryMapper, field reflect.StructField) bool {
 	value := extractString(q, field)
+	// 0 and "" indicate the field was never set or that the user wants to use
+	// the default.
 	return value == "0" || value == ""
 }

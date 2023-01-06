@@ -22,10 +22,10 @@ type RecentChanges struct {
 }
 
 /*
-RecentChanges.Map outputs the parameters as a map for mwclient.Client.Get actions.
+RecentChanges.Map() outputs the parameters as a map for mwclient.Client.Get actions.
 */
 func (rc RecentChanges) Map() map[string]string {
-	fields, output := prepMap(struct{ RecentChanges }{})
+	fields, output := PrepMap(struct{ RecentChanges }{})
 
 	for _, field := range fields {
 
@@ -34,7 +34,7 @@ func (rc RecentChanges) Map() map[string]string {
 		}
 
 		// if can't find the prefix tag, its ok to be blank string
-		getKeyAndValue(rc, field, output)
+		GetKeyAndValue(rc, field, output)
 
 		if field.Name == "NextPage" {
 			output["continue"] = output["nextpage"]

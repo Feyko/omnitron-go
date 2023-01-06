@@ -32,7 +32,7 @@ It will only allow one of the following: PageId, Title, Page.
 It will take the first it encounters in that order, discarding the others.
 */
 func (pa Parse) Map() map[string]string {
-	fields, output := prepMap(struct{ Parse }{})
+	fields, output := PrepMap(struct{ Parse }{})
 
 	// these values are mutually exclusive to one another. If more than one are set we don't want
 	// them all sent to the api parameters.
@@ -57,7 +57,7 @@ func (pa Parse) Map() map[string]string {
 			alreadyHaveContentIdentifier = !isFieldBlank(pa, field)
 		}
 
-		getKeyAndValue(pa, field, output)
+		GetKeyAndValue(pa, field, output)
 
 	}
 
