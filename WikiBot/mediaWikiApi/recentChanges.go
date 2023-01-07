@@ -25,7 +25,7 @@ type RecentChanges struct {
 RecentChanges.Map() outputs the parameters as a map for mwclient.Client.Get actions.
 */
 func (rc RecentChanges) Map() map[string]string {
-	fields, output := PrepMap(struct{ RecentChanges }{})
+	fields, output := PrepMap(RecentChanges{})
 
 	for _, field := range fields {
 

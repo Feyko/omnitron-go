@@ -81,3 +81,23 @@ func (bot *Core) GetRecentChanges(parameters *mwApi.RecentChanges) (*jason.Objec
 
 	return resp, nil
 }
+
+/*
+ParsePage is a wrapper around WikiGet for parsing a page wit default returns of WikiText,Categories, and Templates.
+
+Pass a PageId # for Parse Page. If need to look up a page by Title or Page parameters instead, use WikiGet.
+
+If need additional returns other than WikiText, Categories, Templates, use WikiGet
+*/
+func (bot *Core) ParsePage(pageId string) (*jason.Object, error) {
+	var parameters mwApi.Parse
+	parameters.PageId = pageId
+
+	resp, err := bot.WikiGet(parameters)
+	if err != nil {
+		return nil, errors.Wrap(err, "ParsePage: %v")
+	}
+
+	return resp, nil
+
+}

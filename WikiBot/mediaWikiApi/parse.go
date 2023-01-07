@@ -22,7 +22,7 @@ type Parse struct {
 	Title        string
 	Page         string
 	ContentModel string `default:"text"`
-	Prop         string `default:"wikitext|categories"` // A pipe separated list of properties. see https://www.mediawiki.org/wiki/API:Parsing_wikitext#parse
+	Prop         string `default:"wikitext|categories|templates"` // A pipe separated list of properties. see https://www.mediawiki.org/wiki/API:Parsing_wikitext#parse
 }
 
 /*
@@ -32,7 +32,7 @@ It will only allow one of the following: PageId, Title, Page.
 It will take the first it encounters in that order, discarding the others.
 */
 func (pa Parse) Map() map[string]string {
-	fields, output := PrepMap(struct{ Parse }{})
+	fields, output := PrepMap(Parse{})
 
 	// these values are mutually exclusive to one another. If more than one are set we don't want
 	// them all sent to the api parameters.
