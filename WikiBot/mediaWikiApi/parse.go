@@ -1,9 +1,5 @@
 package mwApi
 
-import (
-	"golang.org/x/exp/slices"
-)
-
 /*
 	Parse is the parameter set for parsing a page of the wiki.
 
@@ -31,38 +27,6 @@ type Parse struct {
 It will only allow one of the following: PageId, Title, Page.
 It will take the first it encounters in that order, discarding the others.
 */
-func (pa Parse) Map() map[string]string {
-	fields, output := PrepMap(Parse{})
-
-	// these values are mutually exclusive to one another. If more than one are set we don't want
-	// them all sent to the api parameters.
-	contentIdentifiers := []string{"PageId", "Page", "Title"}
-
-	alreadyHaveContentIdentifier := false
-
-	for _, field := range fields {
-
-		if field.Name == "Parse" {
-			continue
-		}
-
-		// since reflection returns the slice of fields in the order in which they are defined on the struct
-		// we can use that to define priority as well
-		if slices.Contains(contentIdentifiers, field.Name) {
-
-			if alreadyHaveContentIdentifier {
-				continue
-			}
-
-			alreadyHaveContentIdentifier = !isFieldBlank(pa, field)
-		}
-
-		GetKeyAndValue(pa, field, output)
-
-	}
-
-	//ok := verifyDependantKeysPresent(output, parseKeyDependencies)
-
-	return output
-
+func (pa *Parse) Transform(in map[string]string) {
+	// I would probably just add a "unique" tag to the map utils
 }

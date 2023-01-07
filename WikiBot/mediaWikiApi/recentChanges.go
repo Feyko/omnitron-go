@@ -24,24 +24,12 @@ type RecentChanges struct {
 /*
 RecentChanges.Map() outputs the parameters as a map for mwclient.Client.Get actions.
 */
-func (rc RecentChanges) Map() map[string]string {
-	fields, output := PrepMap(RecentChanges{})
-
-	for _, field := range fields {
-
-		if field.Name == "RecentChanges" {
-			continue
-		}
-
-		// if can't find the prefix tag, its ok to be blank string
-		GetKeyAndValue(rc, field, output)
-
-		if field.Name == "NextPage" {
-			output["continue"] = output["nextpage"]
-			delete(output, "nextpage")
-		}
-
+func (rc *RecentChanges) Transform(in map[string]string) {
+	_, ok := in["nextpage"]
+	if !ok {
+		return
 	}
 
-	return output
+	in["continue"] = in["nextpage"]
+	delete(in, "nextpage")
 }

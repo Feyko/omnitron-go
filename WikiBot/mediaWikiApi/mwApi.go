@@ -22,23 +22,28 @@ Use tags when implementing a QueryMapper:
 	ignore:"any value" if the ignore tag is present, this property is ignored and not included in the Map output.
 */
 
-type QueryMapper interface {
-	Map() map[string]string
+type ParameterSet interface {
+	Transform(map[string]string)
 }
 
-/*PrepMap takes a Type and generates the fields and a preparatory map for them.
+/* Map takes a parameter set and makes it into a map suited for use as parameters for the API
  */
-func PrepMap(structType any) ([]reflect.StructField, map[string]string) {
-	fields := reflect.VisibleFields(reflect.TypeOf(structType))
-
+func Map(parameterSet ParameterSet) map[string]string {
+	// Using ValueOf and Elem might not be necessary, I don't exactly remember the semantics. Try it!
+	fields := reflect.VisibleFields(reflect.ValueOf(parameterSet).Elem().Type())
 	output := make(map[string]string, len(fields))
-	return fields, output
+
+	for _, field := range fields {
+		GetKeyAndValue(parameterSet, field, output)
+	}
+
+	return output
 }
 
 /*
 GetKeyAndValue is a helper for converting a QueryMapper type fields to a map.
 */
-func GetKeyAndValue(q QueryMapper, field reflect.StructField, output map[string]string) {
+func GetKeyAndValue(q any, field reflect.StructField, output map[string]string) {
 	value, includeKey := getValueOrDefault(q, field)
 	prefix, _ := field.Tag.Lookup("prefix")
 
@@ -52,7 +57,7 @@ func GetKeyAndValue(q QueryMapper, field reflect.StructField, output map[string]
 /*
 GetValueOrDefault is a helper for determining the value of a QueryMapper field or its default.
 */
-func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string, ok bool) {
+func getValueOrDefault(q any, field reflect.StructField) (value string, ok bool) {
 
 	value = extractString(q, field)
 
@@ -75,10 +80,11 @@ func getValueOrDefault(q QueryMapper, field reflect.StructField) (value string, 
 	return value, true
 }
 
+// reflect.Value.String() already does this
 /*
-ExtractString gets the value of the field back as a string, for use in the QueryMapper.Map() functions
+	extractString gets the value of the field back as a string, for use in the QueryMapper.Map() functions
 */
-func extractString(q QueryMapper, field reflect.StructField) (value string) {
+func extractString(q any, field reflect.StructField) (value string) {
 	fieldValue := reflect.ValueOf(q).FieldByName(field.Name)
 
 	if fieldValue.Kind() == reflect.Int {
@@ -90,9 +96,11 @@ func extractString(q QueryMapper, field reflect.StructField) (value string) {
 	return value
 }
 
+// Probably use pointers to determine if something was set. Checking the zero-value isn't safe as they are probably a valid value.
+// Also, reflect has a function for that
 /* isFieldBlank is a helper function for determining if fields have 0 or "" indicating they were not set
  */
-func isFieldBlank(q QueryMapper, field reflect.StructField) bool {
+func isFieldBlank(q any, field reflect.StructField) bool {
 	value := extractString(q, field)
 	// 0 and "" indicate the field was never set or that the user wants to use
 	// the default.
